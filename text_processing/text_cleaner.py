@@ -6,12 +6,15 @@ from typing import List, Set
 
 
 class TextCleaner:
-    def __init__(self, language: str = "russian", file_path: str = "text.docx", output_file_path = "Андреєв_етап1.docx"):
+    def __init__(self, language: str = "russian",
+                 file_path: str = "text.docx",
+                 output_file_path: str = "Андреєв_етап1.docx"):
         download('stopwords')
         download('punkt')
         self.__language = language
         self.__stop_words = set(stopwords.words(self.__language))
         self.__file_path = file_path
+        self.__output_file_path = output_file_path
         self.__document = Document(self.__file_path)
         self.__last_text_words_count = 0
         self.__last_used_stop_words = []
@@ -76,4 +79,4 @@ class TextCleaner:
         self.__reset_results()
         self.__clear_paragraphs()
         self.__clear_tables()
-        self.__document.save("cleared_text.docx")
+        self.__document.save(self.__output_file_path)

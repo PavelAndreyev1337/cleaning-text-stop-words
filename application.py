@@ -7,10 +7,11 @@ class Application:
 
     def run(self):
         self.__text_cleaner.clear()
-        print("Set of all stop words:", self.__text_cleaner.stop_words)
-        print("Set of used stop words:", set(
+        print("\nSet of all stop words:", self.__text_cleaner.stop_words)
+        print("\nSet of used stop words:", set(
             self.__text_cleaner.last_used_stop_words))
-        print("Number of stop words used:", len(
+        print("\nNumber of stop words used:", len(
             self.__text_cleaner.last_used_stop_words))
-        print("Percentage of stop words in the given text:",
-              str(int(round(self.__text_cleaner.get_last_stop_words_percentage(), 2) * 100)) + "%")
+        print("\nPercentage of stop words in the given text:",
+              str(int(round(self.__text_cleaner
+                            .get_last_stop_words_percentage(), 2) * 100)) + "%")
