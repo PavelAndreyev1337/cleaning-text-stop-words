@@ -7,4 +7,4 @@
 
 ## Output
 
-![screen](docs\output.png)
+![screen](./docs/output.png)
