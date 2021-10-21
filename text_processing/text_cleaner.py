@@ -4,6 +4,8 @@ from nltk.tokenize import word_tokenize
 from docx import Document
 from typing import Dict, List, Set
 from openpyxl import Workbook
+from openpyxl.styles import Font
+from openpyxl.utils import get_column_letter
 from collections import Counter
 
 
@@ -117,16 +119,21 @@ class TextCleaner:
         for key_word, root in self.__frequent_words.items():
             self.__text_words_frequency[key_word] = 0
             self.__paragraph_words_frequency[key_word] = {}
-            for i, paragraph in enumerate(self.__document.paragraphs):
-                self.__paragraph_words_frequency[key_word][i] = 0
-                self.__paragraph_words_counts[i] = 0
+            paragraph_count = 0
+            for paragraph in self.__document.paragraphs:
+                self.__paragraph_words_frequency[key_word][paragraph_count] = 0
+                self.__paragraph_words_counts[paragraph_count] = 0
+                if not paragraph.text:
+                    continue
                 for run in paragraph.runs:
                     words = word_tokenize(run.text)
-                    self.__paragraph_words_counts[i] += len(words)
+                    self.__paragraph_words_counts[paragraph_count] += len(
+                        words)
                     for word in words:
                         if word.startswith(root):
                             self.__text_words_frequency[key_word] += 1
-                            self.__paragraph_words_frequency[key_word][i] += 1
+                            self.__paragraph_words_frequency[key_word][paragraph_count] += 1
+                paragraph_count += 1
         self.__workbook.save(self.__output_xlsx_file_path)
         self.__text_words_frequency = {word: count for word, count in
                                        sorted(self.__text_words_frequency.items(),
@@ -144,10 +151,27 @@ class TextCleaner:
                     self.__relative_frequency[word][paragraph_number] = round(
                         words_count / self.__paragraph_words_counts[paragraph_number], 3)
 
-    def export_last_relative_frequency_to_csv(self,
-                                              frequent_words: Dict[str, str] = {},
-                                              output_xlsx_file_path: str = "Андреєв_етап3.xlsx",
-                                              frequent_words_count: int = 21):  # stage 3
+    def __add_paragraphs_words_frequency_to_xlsx(self,
+                                                 worksheet_title: str,
+                                                 paragraphs_words_frequency: Dict[str, Dict[int, int]]):
+        worksheet = self.__workbook.create_sheet(worksheet_title)
+        worksheet.cell(row=1, column=1,
+                       value="Кількість слів в абазаці").font = Font(bold=True)
+        for i in range(len(self.__paragraph_words_counts) + 1):  # set width for columns
+            worksheet.column_dimensions[get_column_letter(i + 1)].width = 20
+        for i, words_count in self.__paragraph_words_counts.items():
+            worksheet.cell(row=i + 2, column=1, value=words_count)
+        for i, frequent_word in enumerate(self.__frequent_words):
+            worksheet.cell(row=1, column=i + 2,
+                           value=frequent_word).font = Font(bold=True)
+            for paragraph_number, words_count in paragraphs_words_frequency[frequent_word].items():
+                worksheet.cell(row=paragraph_number + 2,
+                               column=i+2, value=words_count)
+
+    def export_last_paragraphs_words_frequency_to_xlsx(self,
+                                                       frequent_words: Dict[str, str] = {},
+                                                       output_xlsx_file_path: str = "Андреєв_етап3.xlsx",
+                                                       frequent_words_count: int = 21):  # stage 3
         self.__output_xlsx_file_path = output_xlsx_file_path
         self.__frequent_words_count = frequent_words_count
         self.__workbook = Workbook()
@@ -180,9 +204,15 @@ class TextCleaner:
                 "граф": "граф",
             }
         else:
-            self.__frequent_words = frequent_words
+            self.__frequent_words = frequent_words[:self.__frequent_words_count]
         self.__calculate_words_count()
         self.__calculate_relative_frequency()
+        self.__add_paragraphs_words_frequency_to_xlsx(
+            "Абсолютна частота", self.__paragraph_words_frequency)
+        self.__add_paragraphs_words_frequency_to_xlsx(
+            "Відносна частота", self.__relative_frequency)
+        self.__workbook.remove(self.__workbook[self.__workbook.sheetnames[0]])
+        self.__workbook.save(self.__output_xlsx_file_path)
 
     def clear(self):
         self.__reset_results()
