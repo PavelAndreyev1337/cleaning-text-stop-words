@@ -125,14 +125,12 @@ class TextCleaner:
                 self.__paragraph_words_counts[paragraph_count] = 0
                 if not paragraph.text:
                     continue
-                for run in paragraph.runs:
-                    words = word_tokenize(run.text)
-                    self.__paragraph_words_counts[paragraph_count] += len(
-                        words)
-                    for word in words:
-                        if word.startswith(root):
-                            self.__text_words_frequency[key_word] += 1
-                            self.__paragraph_words_frequency[key_word][paragraph_count] += 1
+                words = word_tokenize(paragraph.text)
+                self.__paragraph_words_counts[paragraph_count] += len(words)
+                for word in words:
+                    if word.startswith(root):
+                        self.__text_words_frequency[key_word] += 1
+                        self.__paragraph_words_frequency[key_word][paragraph_count] += 1
                 paragraph_count += 1
         self.__workbook.save(self.__output_xlsx_file_path)
         self.__text_words_frequency = {word: count for word, count in
@@ -158,7 +156,7 @@ class TextCleaner:
         worksheet.cell(row=1, column=1,
                        value="Кількість слів в абазаці").font = Font(bold=True)
         for i in range(len(self.__paragraph_words_counts) + 1):  # set width for columns
-            worksheet.column_dimensions[get_column_letter(i + 1)].width = 20
+            worksheet.column_dimensions[get_column_letter(i + 1)].width = 25
         for i, words_count in self.__paragraph_words_counts.items():
             worksheet.cell(row=i + 2, column=1, value=words_count)
         for i, frequent_word in enumerate(self.__frequent_words):
