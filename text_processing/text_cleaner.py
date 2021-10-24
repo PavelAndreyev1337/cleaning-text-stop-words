@@ -120,18 +120,24 @@ class TextCleaner:
             self.__text_words_frequency[key_word] = 0
             self.__paragraph_words_frequency[key_word] = {}
             paragraph_count = 0
-            for paragraph in self.__document.paragraphs:
-                self.__paragraph_words_frequency[key_word][paragraph_count] = 0
-                self.__paragraph_words_counts[paragraph_count] = 0
-                if not paragraph.text:
-                    continue
-                words = word_tokenize(paragraph.text)
-                self.__paragraph_words_counts[paragraph_count] += len(words)
-                for word in words:
-                    if word.startswith(root):
-                        self.__text_words_frequency[key_word] += 1
-                        self.__paragraph_words_frequency[key_word][paragraph_count] += 1
-                paragraph_count += 1
+            current_paragraph = ''
+            for i, paragraph in enumerate(self.__document.paragraphs):
+                current_paragraph += paragraph.text
+                words = word_tokenize(current_paragraph)
+                if current_paragraph and current_paragraph[0].isdigit() \
+                    and ((len(self.__document.paragraphs) - 1 >= i + 1 \
+                    and self.__document.paragraphs[i+1].text \
+                    and self.__document.paragraphs[i+1].text[0].isdigit())
+                    or len(self.__document.paragraphs) - 1 == i):
+                    self.__paragraph_words_frequency[key_word][paragraph_count] = 0
+                    self.__paragraph_words_counts[paragraph_count] = 0
+                    self.__paragraph_words_counts[paragraph_count] += len(words)
+                    for word in words:
+                        if word.startswith(root):
+                            self.__text_words_frequency[key_word] += 1
+                            self.__paragraph_words_frequency[key_word][paragraph_count] += 1
+                    paragraph_count += 1
+                    current_paragraph = ''
         self.__workbook.save(self.__output_xlsx_file_path)
         self.__text_words_frequency = {word: count for word, count in
                                        sorted(self.__text_words_frequency.items(),
