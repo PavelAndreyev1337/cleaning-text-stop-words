@@ -34,3 +34,4 @@ class Application:
         # print("\nWords count:", self.__text_cleaner.get_words_count())
         # print("\n Relative_frequency:")
         # self.__print_paragraphs_words_frequency(self.__text_cleaner.relative_frequency)
+        # print("\nCorrelations:", self.__text_cleaner.correlations)
