@@ -25,7 +25,7 @@ class Application:
         print("\nPercentage of stop words in the given text:",
               str(int(round(self.__text_cleaner
                             .get_last_stop_words_percentage(), 2) * 100)) + "%")
-        # self.__text_cleaner.export_last_paragraphs_words_frequency_to_xlsx()
+        self.__text_cleaner.export_to_xlsx()
         # print("\nFrequent words:", self.__text_cleaner.frequent_words.keys())
         # print("\nFrequency of words in paragraphs:")
         # self.__print_paragraphs_words_frequency(self.__text_cleaner.paragraph_words_frequency)
