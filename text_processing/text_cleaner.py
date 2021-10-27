@@ -287,7 +287,6 @@ class TextCleaner:
         for column_word, correlation in self.__correlations[keyword].items():
             if column_word != keyword \
                     and lower_correlation_limit <= correlation <= upper_correlation_limit:
-                    # and correlation > 0.15:
                 return column_word
 
     def __split_paragraphs_to_groups(self,
